@@ -1,0 +1,8 @@
+services:
+  container1:
+    build: ./blue
+    tty: true
+    ports:
+      - "21022:22"
+      - "21080:80"
+      - "21081:81"

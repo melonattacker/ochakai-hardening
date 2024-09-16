@@ -1,0 +1,4 @@
+# ルートにアクセスがあった場合、index.phpにリダイレクト
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/$
+RewriteRule ^$ /index.php [L]
