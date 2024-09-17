@@ -1,0 +1,2 @@
+requests==2.32.3
+paramiko==3.5.0
