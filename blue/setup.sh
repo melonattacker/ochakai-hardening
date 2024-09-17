@@ -18,6 +18,7 @@ cp -r /blue/file-reader/* /var/www/html/file-reader/
 cp -r /blue/ping-checker/* /var/www/html/ping-checker/
 cp /blue/apache/.htaccess /var/www/html/file-reader/.htaccess
 cp /blue/apache/.htaccess /var/www/html/ping-checker/.htaccess
+chown -R www-data:www-data /var/www/html/
 a2ensite 000-default.conf
 apachectl start
 
