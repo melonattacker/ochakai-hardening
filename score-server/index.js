@@ -1,53 +1,91 @@
 const express = require('express');
+const axios = require('axios');
 const app = express();
 const port = 3000;
 
 app.set('view engine', 'ejs');
 
 app.use(express.json());
+app.use(express.static('public'));  // Serve static files (e.g., CSS, JS)
 
-// In-memory storage for player scores (player_id: score)
-let playerScores = {
-  1: { name: 'Player 1', score: 0 },
-  2: { name: 'Player 2', score: 0 },
-  3: { name: 'Player 3', score: 0 },
-  4: { name: 'Player 4', score: 0 },
-  5: { name: 'Player 5', score: 0 },
-  6: { name: 'Player 6', score: 0 },
-  7: { name: 'Player 7', score: 0 },
-};
+let gameStarted = false;
+let startTime = null;
+let elapsedTime = 0;
 
-app.get('/', (req, res) => {
-  // Convert playerScores object into an array for easier iteration
-  const players = Object.keys(playerScores).map(player_id => ({
-    name: playerScores[player_id].name,
-    score: playerScores[player_id].score
-  }));
+// Fetch attack progress and calculate player scores
+async function updateScores() {
+  try {
+    const response = await axios.get('http://red:5555/attack-progress');
+    const progress = response.data;
 
-  // Sort players by score in descending order
-  players.sort((a, b) => b.score - a.score);
+    const playerScores = {
+      1: { name: 'Player 1', score: 0 },
+      2: { name: 'Player 2', score: 0 },
+      3: { name: 'Player 3', score: 0 },
+      4: { name: 'Player 4', score: 0 },
+      5: { name: 'Player 5', score: 0 },
+      6: { name: 'Player 6', score: 0 },
+      7: { name: 'Player 7', score: 0 },
+    };
 
-  // Render the template with the sorted players
-  res.render('index', { players: players });
+    // Calculate scores based on attack progress
+    for (let step in progress) {
+      for (let container in progress[step]) {
+        const result = progress[step][container];
+        const player_id = container.replace('container', '');  // e.g., 'container1' -> '1'
+        
+        if (result === 'failed') {
+          playerScores[player_id].score += 50;
+        }
+      }
+    }
+    console.log(playerScores);
+    return playerScores;
+  } catch (error) {
+    console.error('Error fetching attack progress:', error.message);
+  }
+}
+
+// Start game by sending POST request to http://red:5555/game-start
+app.post('/start-game', async (req, res) => {
+  try {
+    const response = await axios.post('http://red:5555/game-start');
+    if (response.data.status === 'Game started') {
+      gameStarted = true;
+      startTime = Date.now();
+      return res.json({ status: 'Game started' });
+    } else {
+      return res.status(500).json({ status: 'Failed to start game' });
+    }
+  } catch (error) {
+    console.error('Error starting game:', error.message);
+    return res.status(500).json({ status: 'Failed to start game' });
+  }
 });
 
-app.post('/score', (req, res) => {
-  const { player_id, score } = req.body;
+// Serve the main page
+app.get('/', async (req, res) => {
+  try {
+    const playerScores = await updateScores();
 
-  if (!player_id || !score) {
-    res.status(400).json({ error: 'player_id and score are required' });
-  }
+    // Convert playerScores object into an array for easier iteration
+    const players = Object.keys(playerScores).map(player_id => ({
+      name: playerScores[player_id].name,
+      score: playerScores[player_id].score
+    }));
 
-  // Convert score to integer
-  const scoreInt = parseInt(score, 10);
+    // Sort players by score in descending order
+    players.sort((a, b) => b.score - a.score);
 
-  // Check if player exists
-  if (playerScores[player_id]) {
-    // Increase player's score
-    playerScores[player_id].score += scoreInt;
-    res.json({ player_id, score: playerScores[player_id].score });
-  } else {
-    res.status(404).json({ error: 'Player not found' });
+    // Calculate elapsed time
+    if (gameStarted) {
+      elapsedTime = Math.floor((Date.now() - startTime) / 1000);  // In seconds
+    }
+
+    res.render('index', { players, gameStarted, elapsedTime });
+  } catch (error) {
+    console.error('Error fetching attack progress:', error.message);
+    res.status(500).send('Error fetching attack progress');
   }
 });
 

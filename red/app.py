@@ -5,7 +5,15 @@ from flask import Flask, jsonify
 import threading
 
 # Variables for hostname and port numbers
-HOSTNAMES = ['container1']  # Add more hostnames as needed
+HOSTNAMES = [
+    'container1', 
+    'container2',
+    'container3',
+    'container4',
+    'container5',
+    'container6',
+    'container7',
+]  # Add more hostnames as needed
 SSH_PORT = 22
 HTTP_PORT = 80
 

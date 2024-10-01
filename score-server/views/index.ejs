@@ -3,63 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Score Board</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        table {
-            width: 50%;
-            margin: 20px auto;
-            border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-
-        td {
-            color: #333;
-        }
-    </style>
+    <title>Player Scores</title>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
+    <h1>Player Scores</h1>
 
-    <h1>Score Board</h1>
     <table>
         <thead>
             <tr>
-                <th>Rank</th>
                 <th>Player</th>
                 <th>Score</th>
             </tr>
         </thead>
         <tbody>
-            <% players.forEach(function(player, index) { %>
+            <% players.forEach(function(player) { %>
                 <tr>
-                    <td><%= index + 1 %></td>
                     <td><%= player.name %></td>
                     <td><%= player.score %></td>
                 </tr>
@@ -67,5 +26,51 @@
         </tbody>
     </table>
 
+    <div id="game-controls">
+        <% if (!gameStarted) { %>
+            <button id="start-game">Start Game</button>
+        <% } else { %>
+            <p id="timer">Elapsed Time: <%= elapsedTime %> seconds</p>
+        <% } %>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startButton = document.getElementById('start-game');
+            const timerDisplay = document.getElementById('timer');
+
+            if (startButton) {
+                startButton.addEventListener('click', async function() {
+                    try {
+                        const response = await fetch('/start-game', { method: 'POST' });
+                        const data = await response.json();
+
+                        if (data.status === 'Game started') {
+                            gameStarted = true;
+                            startButton.style.display = 'none';
+                            startTimer();
+                        }
+                    } catch (error) {
+                        console.error('Failed to start game:', error);
+                    }
+                });
+            }
+
+            function startTimer() {
+                setInterval(function() {
+                    if (elapsedTime < 1800) { // 30 minutes = 1800 seconds
+                        elapsedTime++;
+                        timerDisplay.textContent = `Elapsed Time: ${elapsedTime} seconds`;
+                    } else {
+                        timerDisplay.textContent = 'Game ended';
+                    }
+                }, 1000);
+            }
+
+            if (gameStarted) {
+                startTimer();
+            }
+        });
+    </script>
 </body>
 </html>
