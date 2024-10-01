@@ -24,7 +24,7 @@ RUN chmod +x setup.sh
 
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-EXPOSE 22 80 81
+EXPOSE 22 80
 
 RUN a2enmod php8.3 && \
     a2enmod rewrite

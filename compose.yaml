@@ -5,4 +5,15 @@ services:
     ports:
       - "21022:22"
       - "21080:80"
-      - "21081:81"
+
+  red:
+    build: ./red
+    tty: true
+    ports:
+      - "5555:5555"
+
+  score-server:
+    build: ./score-server
+    tty: true
+    ports:
+      - "3000:3000"

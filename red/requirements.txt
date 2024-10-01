@@ -1,2 +1,4 @@
 requests==2.32.3
 paramiko==3.5.0
+Flask == 3.0.3
+uWSGI == 2.0.23
