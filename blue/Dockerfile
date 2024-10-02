@@ -16,7 +16,8 @@ RUN apt-get update && \
     net-tools \
     ufw \
     w3m \
-    openssh-server && \
+    openssh-server \
+    vim && \
     apt-get clean
 
 COPY . .

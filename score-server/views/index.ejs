@@ -5,20 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Player Scores</title>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* Style adjustments for the Game Start button */
+        #start-game {
+            font-size: 24px;
+            padding: 15px 30px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        #start-game:hover {
+            background-color: #218838;
+        }
+
+        #timer {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        #game-controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <h1>Player Scores</h1>
 
+    <!-- Game Start button and timer will be shown here -->
+    <div id="game-controls">
+        <% if (!gameStarted) { %>
+            <button id="start-game">Start Game</button>
+        <% } %>
+        <p id="timer">Elapsed Time: 0 minutes and 0 seconds</p>
+    </div>
+
+    <!-- Player scores table -->
     <table>
         <thead>
             <tr>
+                <th>Rank</th>
                 <th>Player</th>
                 <th>Score</th>
             </tr>
         </thead>
         <tbody>
-            <% players.forEach(function(player) { %>
+            <% players.forEach(function(player, index) { %>
                 <tr>
+                    <td><%= index + 1 %></td> <!-- Rank -->
                     <td><%= player.name %></td>
                     <td><%= player.score %></td>
                 </tr>
@@ -26,19 +63,13 @@
         </tbody>
     </table>
 
-    <div id="game-controls">
-        <% if (!gameStarted) { %>
-            <button id="start-game">Start Game</button>
-        <% } else { %>
-            <p id="timer">Elapsed Time: <%= elapsedTime %> seconds</p>
-        <% } %>
-    </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const startButton = document.getElementById('start-game');
             const timerDisplay = document.getElementById('timer');
+            const GAME_DURATION = 1800; // 30 minutes in seconds
 
+            // Start button functionality
             if (startButton) {
                 startButton.addEventListener('click', async function() {
                     try {
@@ -56,17 +87,29 @@
                 });
             }
 
-            function startTimer() {
-                setInterval(function() {
-                    if (elapsedTime < 1800) { // 30 minutes = 1800 seconds
-                        elapsedTime++;
-                        timerDisplay.textContent = `Elapsed Time: ${elapsedTime} seconds`;
-                    } else {
-                        timerDisplay.textContent = 'Game ended';
-                    }
-                }, 1000);
+            // Function to fetch elapsed time from the server and update the display
+            function updateElapsedTime() {
+                fetch('/elapsed-time')
+                    .then(response => response.json())
+                    .then(data => {
+                        const elapsedTime = data.elapsedTime;
+                        const minutes = Math.floor(elapsedTime / 60);
+                        const seconds = elapsedTime % 60;
+                        if (elapsedTime >= GAME_DURATION) {
+                            timerDisplay.textContent = 'Game Ended';
+                        } else {
+                            timerDisplay.textContent = `Elapsed Time: ${minutes} minutes and ${seconds} seconds`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to fetch elapsed time:', error);
+                    });
             }
 
+            // Periodically update the elapsed time from the server every second
+            setInterval(updateElapsedTime, 1000);
+
+            // If the game is already started, start the timer immediately
             if (gameStarted) {
                 startTimer();
             }

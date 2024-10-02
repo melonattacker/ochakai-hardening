@@ -18,7 +18,7 @@
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $ip = $_POST['ip'];
 
-        # pingを実行
+        # execute ping command
         $output = shell_exec("ping -c 3 $ip");
 
         echo "<h3>Ping result for $ip:</h3>";
