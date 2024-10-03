@@ -8,17 +8,19 @@
 <body>
     <h1>Ping Checker</h1>
 
-    <form method="POST" action="">
+    <form method="GET" action="">
         <label for="ip">Enter IP Address to Ping:</label>
         <input type="text" name="ip" id="ip" required>
         <input type="submit" value="Ping">
     </form>
 
     <?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $ip = $_POST['ip'];
+    if (isset($_GET['ip'])) {
+        $ip = $_GET['ip'];
 
-        # execute ping command
+        //$ip = escapeshellarg($ip);
+
+        # Execute ping command
         $output = shell_exec("ping -c 3 $ip");
 
         echo "<h3>Ping result for $ip:</h3>";

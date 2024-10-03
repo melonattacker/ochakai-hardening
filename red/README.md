@@ -24,7 +24,7 @@
 for i in {1..10}; do userdel -r user$i; done
 echo "root:superrootpass" | chpasswd
 rm /var/www/html/memo.txt
-sed -i 's|# execute ping command|if (!filter_var($ip, FILTER_VALIDATE_IP)) { echo "<p>Invalid IP</p>"; exit; }|' /var/www/html/index.php && apachectl restart
+sed -i 's|//$ip = escapeshellarg($ip);|$ip = escapeshellarg($ip);|' /var/www/html/index.php && apachectl restart
 ```
 
 ```bash

