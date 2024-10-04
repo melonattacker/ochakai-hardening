@@ -29,4 +29,5 @@ Click the `Start Game` button at http://localhost:3000.
 <img width="813" alt="Screenshot 2024-10-04 at 13 01 56" src="https://github.com/user-attachments/assets/465f9365-9113-4884-b3fb-b0f3fe0d8142">
 
 ## Attack Scenario
-- [Attack Scenario](./red/README.md)
+**Note: Be careful, as this could be a SPOILER for the players.**
+- [Attack Scenario](./red/README.md) 
