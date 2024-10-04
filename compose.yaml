@@ -1,47 +1,47 @@
 services:
-  container1:
+  player1:
     build: ./blue
     tty: true
     ports:
       - "21022:22"
       - "21080:80"
 
-  container2:
+  player2:
     build: ./blue
     tty: true
     ports:
       - "22022:22"
       - "22080:80"
   
-  container3:
+  player3:
     build: ./blue
     tty: true
     ports:
       - "23022:22"
       - "23080:80"
   
-  container4:
+  player4:
     build: ./blue
     tty: true
     ports:
       - "24022:22"
       - "24080:80"
   
-  container5:
+  player5:
     build: ./blue
     tty: true
     ports:
       - "25022:22"
       - "25080:80"
   
-  container6:
+  player6:
     build: ./blue
     tty: true
     ports:
       - "26022:22"
       - "26080:80"
   
-  container7:
+  player7:
     build: ./blue
     tty: true
     ports:
