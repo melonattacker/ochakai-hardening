@@ -5,6 +5,9 @@ services:
     ports:
       - "21022:22"
       - "21080:80"
+    networks:
+      ochakai-network:
+        ipv4_address: 172.18.0.11
 
   player2:
     build: ./blue
@@ -12,6 +15,9 @@ services:
     ports:
       - "22022:22"
       - "22080:80"
+    networks:
+      ochakai-network:
+        ipv4_address: 172.18.0.12
   
   player3:
     build: ./blue
@@ -19,6 +25,9 @@ services:
     ports:
       - "23022:22"
       - "23080:80"
+    networks:
+      ochakai-network:
+        ipv4_address: 172.18.0.13
   
   player4:
     build: ./blue
@@ -26,6 +35,9 @@ services:
     ports:
       - "24022:22"
       - "24080:80"
+    networks:
+      ochakai-network:
+        ipv4_address: 172.18.0.14
   
   player5:
     build: ./blue
@@ -33,6 +45,9 @@ services:
     ports:
       - "25022:22"
       - "25080:80"
+    networks:
+      ochakai-network:
+        ipv4_address: 172.18.0.15
   
   player6:
     build: ./blue
@@ -40,6 +55,9 @@ services:
     ports:
       - "26022:22"
       - "26080:80"
+    networks:
+      ochakai-network:
+        ipv4_address: 172.18.0.16
   
   player7:
     build: ./blue
@@ -47,15 +65,31 @@ services:
     ports:
       - "27022:22"
       - "27080:80"
+    networks:
+      ochakai-network:
+        ipv4_address: 172.18.0.17
 
   red:
     build: ./red
     tty: true
     ports:
       - "5555:5555"
+    networks:
+      ochakai-network:
+        ipv4_address: 172.18.0.18
 
   score-server:
     build: ./score-server
     tty: true
     ports:
       - "3000:3000"
+    networks:
+      ochakai-network:
+        ipv4_address: 172.18.0.19
+
+networks:
+  ochakai-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16

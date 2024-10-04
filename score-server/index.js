@@ -24,6 +24,11 @@ const playerScores = {
 
 // Add score to the specified player
 app.post('/score', (req, res) => {
+  const redIP = '::ffff:172.18.0.18';
+  if (req.ip !== redIP) {
+    console.log(`Request from unauthorized IP: ${req.ip}`);
+    return res.status(403).json({ status: 'Access denied' });
+  }
   const { player_id, score } = req.body;
   if (playerScores[player_id]) {
     playerScores[player_id].score += score;
