@@ -1,4 +1,8 @@
 # ochakai-hardening
+<div align="center">
+    <img width="300" alt="ochakai-hardening-logo" src="https://github.com/user-attachments/assets/f14cd21b-e947-40b2-8ba8-1a2c36eb5339">
+</div>
+
 Ochakai Hardening is a tool that allows users to easily experience incident response training. It was created with the aim of serving as an icebreaker within teams participating in Japan's security hardening competition, the "[ハードニング競技会](https://wasforum.jp/hardening-project/)". Also, Ochakai Hardening was inspired by [ayato-hardening](https://github.com/ayato-shitomi/ayato-hardening/tree/master).
 
 ## Setup
