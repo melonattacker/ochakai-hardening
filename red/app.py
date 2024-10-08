@@ -23,6 +23,10 @@ CHECK_DURATION = 1800  # 30 minutes in seconds
 # Create Flask app
 app = Flask(__name__)
 
+# Game running flag
+game_running = False
+game_lock = threading.Lock()
+
 # Function to send score update to score server
 def send_score_update(player_id, score):
     data = {
@@ -204,6 +208,13 @@ def attack_sequence():
 # Flask route to start the game
 @app.route('/game-start', methods=['POST'])
 def game_start():
+    global game_running
+    with game_lock:
+        if game_running:
+            return jsonify({"status": "error", "message": "Game is already running"}), 400
+        else:
+            game_running = True
+
     # Start the attack sequence in a new thread
     attack_thread = threading.Thread(target=attack_sequence)
     attack_thread.start()

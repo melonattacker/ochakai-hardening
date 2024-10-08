@@ -98,6 +98,10 @@
                         if (elapsedTime >= GAME_DURATION) {
                             timerDisplay.textContent = 'Game Ended';
                         } else {
+                            // If the game has started by other players, hide the Start Game button
+                            if (elapsedTime > 0 && startButton.style.display !== 'none') {
+                                startButton.style.display = 'none';
+                            }
                             timerDisplay.textContent = `Elapsed Time: ${minutes} minutes and ${seconds} seconds`;
                         }
                     })
